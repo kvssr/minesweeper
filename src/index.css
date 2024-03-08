@@ -26,8 +26,14 @@ code {
   align-items: center;
   justify-content: center;
   border: black solid 1px;
-  padding: 5px 12px;
+  /* padding: 5px 12px; */
+  width: 20px;
+  height: 20px;
   background-color: #97a5ca;
+}
+
+.board-cell:hover {
+  background-color: #cad3eb;
 }
 
 .bomb {
