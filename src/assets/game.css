@@ -1,0 +1,67 @@
+.newGameBtn>p {
+    font-size: 28px;
+}
+
+.newGameBtn>p:hover {
+    color: #D5CC5C;
+}
+
+.board {
+    width: fit-content;
+    margin: auto;
+    align-items: center;
+}
+
+.board-row {
+    display: flex;
+    justify-content: center;
+}
+
+.board-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: black solid 1px;
+    /* padding: 5px 12px; */
+    width: 20px;
+    height: 20px;
+    background-color: #629086;
+}
+
+.board-cell:hover {
+    background-color: #D5CC5C;
+}
+
+.bomb {
+    background-color: #D77B6D;
+}
+
+.visible {
+    background-color: #e9DDCE;
+}
+
+.flagged {
+    background-image: url("./flag.png");
+    background-size: contain;
+}
+
+.score-board {
+    display: flex;
+    justify-content: space-evenly;
+    justify-content: space-between;
+    align-items: center;
+}
+
+@media screen {
+    .score-board {
+        display: flex;
+        justify-content: space-evenly;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 100vw;
+    }
+}
+
+.container {
+    width: fit-content;
+}

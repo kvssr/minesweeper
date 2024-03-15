@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const Timer = ({ gameState }) => {
-  let time = 0;
-  const [timeR, setTimeR] = useState(time);
+  let time = useRef(0);
+  const [timeR, setTimeR] = useState(time.current);
 
   useEffect(() => {
-    if (gameState === "start") {
+    if (gameState === "pregame") time.current = 0;
+    if (gameState === "playing") {
       const interval = setInterval(() => {
         // console.log("🚀 ~ useEffect ~ interval start:", time, interval);
-        time++;
-        setTimeR(time);
+        time.current++;
+        setTimeR(time.current);
       }, 1000);
       return () => {
         clearInterval(interval);
@@ -18,7 +19,7 @@ const Timer = ({ gameState }) => {
   }, [gameState]);
   return (
     <div>
-      <p>{timeR}</p>
+      <p>{("0000" + timeR).slice(-4)}</p>
     </div>
   );
 };

@@ -3,9 +3,10 @@ import React from "react";
 const Cell = ({
   props,
   onMouseDown,
+  onMouseUp,
   onClick,
-  gameState,
-  decreaseFlagCount,
+  onTouchStart,
+  onTouchEnd,
 }) => {
   let { value, x, y, visible } = props;
   let bomb = "";
@@ -16,10 +17,6 @@ const Cell = ({
     value = value === 9 ? "💣" : value;
     value = value === 0 ? "" : value;
   }
-  if (gameState === "failed" && value === 9) {
-    visible = true;
-    value = "💣";
-  }
   let flagged = props.flagged ? "flagged" : "";
   return (
     <div
@@ -27,7 +24,10 @@ const Cell = ({
       key={`b-cell-${x}`}
       id={`${y}-${x}`}
       onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
       onClick={onClick}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
       {visible ? value : ""}
     </div>

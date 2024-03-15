@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
-import generatePuzzle from "../../utils/generator";
-import { revealArea } from "../../utils/generator";
 import Cell from "../../components/Cell";
 import "../../assets/shared.css";
 import Timer from "../../components/Timer";
+import { socket } from "../../socket/socket.js";
+import "../../assets/game.css";
+import useLongPress from "../../components/useLongPress.js";
 
-const Game = () => {
-  let bombs = 60;
-  let visibleCells = 0;
-  const [bombCount, setBombCount] = useState(bombs);
-  const [puzzle, setPuzzle] = useState(generatePuzzle(20, 20, bombCount));
-  const [gameState, setGameState] = useState("pregame");
-  const winCondition = puzzle.length * puzzle[0].length - bombs;
+const Game = ({ game, setGame }) => {
+  const [bombCount, setBombCount] = useState(game.bombCount);
+  const [puzzle, setPuzzle] = useState(game.board);
+  const [gameState, setGameState] = useState(game.gamestate);
+  const { action, handlers } = useLongPress();
   // console.log("puzzle", puzzle);
+  console.log("game", game);
 
   useEffect(() => {
     const handleContextmenu = (e) => {
@@ -24,83 +24,83 @@ const Game = () => {
     };
   }, []);
 
-  useEffect(() => {
-    let flags = 0;
-    for (let i = 0; i < puzzle.length; i++) {
-      for (let j = 0; j < puzzle[0].length; j++) {
-        if (puzzle[i][j].flagged) flags++;
-        if (puzzle[i][j].visible) visibleCells++;
-      }
-    }
-    setBombCount(bombs - flags);
-    if (visibleCells === winCondition) setGameState("won");
-  }, [puzzle]);
+  const updateCells = (cells) => {
+    cells.map((cell) => {
+      console.log("cell", cell);
+      puzzle[cell.y][cell.x] = cell;
+    });
+    setPuzzle([...puzzle]);
+  };
 
-  const handleCellClick = (e) => {
-    // console.log("handle click", e.target);
-    if (gameState === "pregame") setGameState("start");
-    if (gameState === "failed" || gameState === "won") return;
-    console.log("🚀 ~ handleCellClick ~ gameState:", gameState);
-    // if (e.target.innerText === "🚩") return;
+  useEffect(() => {
+    const onGameMoveUpdated = ({ cells, gamestate, bombCount }) => {
+      console.log("onGameMoveUpdated", cells);
+      console.log("onGameMoveUpdated", gamestate);
+      updateCells(cells);
+      setBombCount(bombCount);
+      setGameState(gamestate);
+    };
+
+    const onGameNew = (game) => {
+      console.log("onGameNew", game);
+      setGame(game);
+      setPuzzle(game.board);
+      setBombCount(game.bombCount);
+      setGameState(game.gameState);
+    };
+
+    socket.on("game move updated", onGameMoveUpdated);
+    socket.on("game new", onGameNew);
+
+    return () => {
+      socket.off("game move updated", onGameMoveUpdated);
+      socket.off("game new", onGameNew);
+    };
+  }, [game]);
+
+  // const handleCellClick = (e) => {
+  //   let id = e.target.id.split("-");
+  //   let i = Number(id[0]);
+  //   let j = Number(id[1]);
+  //   if (action === "longpress") {
+  //     console.log("clicking longpress");
+  //     socket.emit("game move selected", { x: j, y: i, value: 1 });
+  //     return;
+  //   }
+  //   socket.emit("game move selected", { x: j, y: i, value: 0 });
+  // };
+
+  const handleCellMouseClick = (e) => {
+    e.preventDefault();
+    // console.log("🚀 ~ handleCellMouseClick ~ e:", e);
     let id = e.target.id.split("-");
     let i = Number(id[0]);
     let j = Number(id[1]);
     if (puzzle[i][j].visible) return;
-    if (puzzle[i][j].flagged) return;
-    if (puzzle[i][j].value === 9) {
-      setGameState("failed");
-      return;
-    }
-    if (puzzle[i][j].value === 0) setPuzzle([...revealArea(puzzle, j, i)]);
-    puzzle[i][j].visible = true;
-    setPuzzle([...puzzle]);
-  };
-
-  const decreaseFlagCount = () => {
-    setBombCount(bombCount + 1);
-    console.log("🚀 ~ decreaseFlagCount ~ bombCount:", bombCount);
-  };
-
-  const handleCellMouseEnter = (e) => {
-    let id = e.target.id.split("-");
-    let i = id[0];
-    let j = id[1];
-    if (!puzzle[i][j].visible) return;
-    e.target.innerText = e.target.id;
-  };
-
-  const handleCellMouseLeave = (e) => {
-    let id = e.target.id.split("-");
-    let i = id[0];
-    let j = id[1];
-    if (!puzzle[i][j].visible) return;
-    e.target.innerText = puzzle[i][j].value;
-  };
-
-  const handleCellMouseClick = (e) => {
-    e.preventDefault();
-    console.log("🚀 ~ handleCellMouseClick ~ e:", e);
-    if (gameState === "failed" || gameState === "won") return;
-    let id = e.target.id.split("-");
-    let i = id[0];
-    let j = id[1];
-    if (puzzle[i][j].visible) return;
     if (e.buttons === 2) {
-      puzzle[i][j].flagged = !puzzle[i][j].flagged;
-      setBombCount(bombCount - 1);
-      setPuzzle([...puzzle]);
+      socket.emit("game move selected", { x: j, y: i, value: 1 });
     }
+  };
+
+  const handleNewGameClick = () => {
+    socket.emit("game new");
   };
 
   return (
     <div className="container">
-      <header>
-        <h1>Minesweeper</h1>
-      </header>
       <div className="score-board">
-        <div className="bomb-counter">
-          <p>{bombCount}</p>
+        <div
+          className="bomb-counter"
+          onTouchEnd={""}
+        >
+          <p>{("0000" + bombCount).slice(-4)}</p>
         </div>
+        <button
+          className="newGameBtn"
+          onClick={handleNewGameClick}
+        >
+          <p>+</p>
+        </button>
         <Timer gameState={gameState} />
       </div>
       <div className="board">
@@ -114,10 +114,10 @@ const Game = () => {
                 return (
                   <Cell
                     props={puzzle[i][j]}
-                    onMouseDown={handleCellMouseClick}
-                    onClick={handleCellClick}
+                    // onMouseDown={handleCellMouseClick}
+                    // onClick={handleCellClick}
                     gameState={gameState}
-                    decreaseFlagCount={decreaseFlagCount}
+                    {...handlers}
                   />
                 );
               })}

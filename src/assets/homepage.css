@@ -1,0 +1,65 @@
+button {
+    all: unset;
+}
+
+input {
+    all: unset;
+}
+
+.hp-container {
+    width: max-content;
+    margin: auto;
+}
+
+.joinRow {
+    display: flex;
+    margin-top: 30px;
+}
+
+.createCol {
+    border: 1px solid #E9DDCE;
+    border-radius: 5%;
+    margin: 5px;
+    padding: 5px 40px;
+    color: #E9DDCE;
+    font-family: "Jost", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 18px;
+}
+
+.createCol:hover {
+    background-color: #E9DDCE;
+    color: #374875;
+}
+
+.joinCol {
+    border: 1px solid #E9DDCE;
+    border-radius: 5%;
+    text-align: center;
+    margin: 5px;
+    display: flex;
+    flex-direction: column;
+    color: #E9DDCE;
+    font-family: "Jost", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 18px;
+}
+
+.joinCol>button {
+    padding: 5px 40px;
+}
+
+.joinCol:hover {
+    background-color: #E9DDCE;
+    color: #314251;
+}
+
+.roomInput {
+    background-color: #fffcf9;
+    color: #314251;
+    width: 100%;
+}

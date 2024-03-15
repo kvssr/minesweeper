@@ -16,48 +16,14 @@ code {
   text-align: center;
 }
 
+header {
+  text-align: center;
+}
+
 @media only screen and (max-width: 768px) {
 
   /* For mobile phones: */
   .container {
     width: 100%;
   }
-}
-
-.board-row {
-  display: flex;
-  justify-content: center;
-}
-
-.board-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: black solid 1px;
-  /* padding: 5px 12px; */
-  width: 20px;
-  height: 20px;
-  background-color: #629086;
-}
-
-.board-cell:hover {
-  background-color: #D5CC5C;
-}
-
-.bomb {
-  background-color: #D77B6D;
-}
-
-.visible {
-  background-color: #e9DDCE;
-}
-
-.flagged {
-  background-image: url("./assets/flag.png");
-  background-size: contain;
-}
-
-.score-board {
-  display: flex;
-  justify-content: space-evenly;
 }
