@@ -7,12 +7,18 @@ export default function useLongPress() {
   const timerRef = useRef();
   const isLongPress = useRef();
 
-  function startPressTimer() {
+  function startPressTimer(i, j) {
     isLongPress.current = false;
     timerRef.current = setTimeout(() => {
       isLongPress.current = true;
       setAction("longpress");
+      console.log("timer longpress");
+      placeFlag(i, j);
     }, 500);
+  }
+
+  function placeFlag(i, j) {
+    socket.emit("game move selected", { x: j, y: i, value: 1 });
   }
 
   function handleOnClick(e) {
@@ -21,7 +27,7 @@ export default function useLongPress() {
     let i = Number(id[0]);
     let j = Number(id[1]);
     if (isLongPress.current) {
-      socket.emit("game move selected", { x: j, y: i, value: 1 });
+      // socket.emit("game move selected", { x: j, y: i, value: 1 });
       return;
     }
     socket.emit("game move selected", { x: j, y: i, value: 0 });
@@ -36,7 +42,7 @@ export default function useLongPress() {
     if (e.button === 2) {
       socket.emit("game move selected", { x: j, y: i, value: 1 });
     }
-    startPressTimer();
+    startPressTimer(i, j);
   }
 
   function handleOnMouseUp() {
@@ -44,13 +50,16 @@ export default function useLongPress() {
     clearTimeout(timerRef.current);
   }
 
-  function handleOnTouchStart() {
+  function handleOnTouchStart(e) {
     console.log("handleOnTouchStart");
-    startPressTimer();
+    let id = e.target.id.split("-");
+    let i = Number(id[0]);
+    let j = Number(id[1]);
+    startPressTimer(i, j);
   }
 
   function handleOnTouchEnd() {
-    if (action === "longpress") return;
+    // if (action === "longpress") return;
     console.log("handleOnTouchEnd");
     clearTimeout(timerRef.current);
   }
